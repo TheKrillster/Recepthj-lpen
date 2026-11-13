@@ -13,11 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Packa upp projektet
+      - name: Packa upp senaste projektet
         run: |
-          ZIP=$(ls *.zip 2>/dev/null | head -1)
-          if [ -n "$ZIP" ]; then
+          ZIP=$(git log --format= --name-only --diff-filter=AM -- '*.zip' | grep -m1 .)
+          echo "Använder: $ZIP"
+          if [ -n "$ZIP" ] && [ -f "$ZIP" ]; then
             unzip -q -o "$ZIP" -d projekt
             S=$(find projekt -name settings.gradle.kts -not -path '*/build/*' | head -1)
             echo "PROJ=$(dirname "$S")" >> $GITHUB_ENV
